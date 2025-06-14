@@ -1,6 +1,6 @@
 from .recorder import start_recording, stop_recording
 
-DOMAIN = "ffmpeg_recorder"
+DOMAIN = "cam_record"
 PROCESS_CACHE = {}
 
 def setup(hass, config):
