@@ -3,13 +3,13 @@ record_start:
   fields:
     stream_url:
       description: RTSP stream URL.
-      example: rtsp://192.168.10.230:8554/front_door_no_mic?mp4
+      example: rtsp://172.16.10.230:8554/front_door?mp4
       required: true
       selector:
         text:
     filename:
       description: File path to record to.
-      example: /media/front_door_20250614.mp4
+      example: /media/front_door.mp4
       required: true
       selector:
         text:
@@ -19,7 +19,7 @@ record_stop:
   fields:
     stream_url:
       description: RTSP stream URL to stop.
-      example: rtsp://192.168.10.230:8554/front_door_no_mic?mp4
+      example: rtsp://172.16.10.230:8554/front_door?mp4
       required: true
       selector:
         text:
