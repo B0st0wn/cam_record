@@ -1,0 +1,7 @@
+{
+  "name": "Cam Record",
+  "content_in_root": false,
+  "domains": ["cam_record"],
+  "country": "US",
+  "homeassistant": "2025.5.0"
+}

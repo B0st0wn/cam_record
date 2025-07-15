@@ -1,7 +1,7 @@
 {
   "domain": "cam_record",
   "name": "Cam Record",
-  "version": "0.1.2",
+  "version": "0.1.0",
   "documentation": "https://github.com/your/repo",
   "dependencies": [],
   "codeowners": ["@yourusername"],
