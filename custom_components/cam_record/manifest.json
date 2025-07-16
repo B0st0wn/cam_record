@@ -2,9 +2,7 @@
   "domain": "cam_record",
   "name": "Cam Record",
   "version": "0.1.2",
-  "documentation": "https://github.com/your/repo",
+  "documentation": "https://github.com/B0st0wn/cam_record",
   "dependencies": [],
   "codeowners": ["@Bost0wn"],
-  "requirements": [],
-  "icon": "https://raw.githubusercontent.com/B0st0wn/cam_record/refs/heads/main/custom_components/cam_record/ODCamLogo.png",
-  "image": "https://raw.githubusercontent.com/B0st0wn/cam_record/refs/heads/main/custom_components/cam_record/ODCamLogo.png"}
+  "requirements": []}

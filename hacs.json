@@ -1,9 +1,3 @@
 {
   "name": "Cam Record",
-  "content_in_root": false,
-  "domains": ["cam_record"],
-  "country": "US",
-  "homeassistant": "2025.5.0",
-  "icon": "https://raw.githubusercontent.com/B0st0wn/cam_record/refs/heads/main/custom_components/cam_record/ODCamLogo.png",
-  "image": "https://raw.githubusercontent.com/B0st0wn/cam_record/refs/heads/main/custom_components/cam_record/ODCamLogo.png",
-  "version": "0.1.2"}
+  "domains": ["cam_record"]}
