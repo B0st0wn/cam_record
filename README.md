@@ -12,10 +12,8 @@ Record any RTSP (or other `ffmpeg`‑readable) camera stream to a local file **o
 
 * **Two services** to control a background `ffmpeg` process:
 
-  * `cam_record.record_start(camera_entity_id | stream_url, filename)`
-  * `cam_record.record_stop(camera_entity_id | stream_url)`
-* **Use camera entities directly**: Provide `camera_entity_id` and the integration resolves the stream URL (fallback to `stream_url` supported).
-* **Graceful stop**: Recordings finalize cleanly for MP4 playback.
+  * `cam_record.record_start(stream_url, filename)`
+  * `cam_record.record_stop(stream_url)`
 * **Works with RTSP** (and anything `ffmpeg` can read).
 * **Saves anywhere you choose** (e.g., under `/media/` so clips appear in HA’s Media browser).
 * **Designed for automations** (motion start/stop, doorbell press) and **dashboard toggles**.
@@ -59,7 +57,6 @@ Add these lines to your **configuration.yaml** and restart Home Assistant:
 
 ```yaml
 ffmpeg:
-stream:
 cam_record:
 ```
 
@@ -71,57 +68,32 @@ Starts an `ffmpeg` process and writes the stream to the provided path.
 
 **Fields**
 
-* `camera_entity_id` (string, optional): Camera entity to record (e.g., `camera.front_door`). Preferred.
-* `stream_url` (string, optional): RTSP/HTTP/etc. Used if no camera entity is provided.
+* `stream_url` (string, required): RTSP/HTTP/etc. (e.g., `rtsp://cam:554/stream`).
 * `filename` (string, required): Full output path (e.g., `/media/front_door/2025-08-17_11-45-00.mp4`).
 
-At least one of `camera_entity_id` or `stream_url` is required.
-
-**Examples**
-
-By camera entity (preferred):
+**Example**
 
 ```yaml
 service: cam_record.record_start
 data:
-  camera_entity_id: camera.front_door
+  stream_url: rtsp://<CAMERA_HOST>:<PORT>/<STREAM_PATH>?mp4
   filename: /media/front_door/front_door_{{ now().strftime('%Y-%m-%d_%H-%M-%S') }}.mp4
-```
-
-By raw stream URL (advanced):
-
-```yaml
-service: cam_record.record_start
-data:\n      camera_entity_id: camera.front_door\n      filename: /media/front_door/front_door_{{ now().strftime('%Y-%m-%d_%H-%M-%S') }}.mp4
 ```
 
 ### `cam_record.record_stop`
 
-Stops an active recording.
+Stops the recording started for the **same** `stream_url`.
 
 **Fields**
 
-* `camera_entity_id` (string, optional): Camera entity to stop.
-* `stream_url` (string, optional): URL to stop (if you started by URL).
+* `stream_url` (string, required): Must exactly match the URL used in `record_start`.
 
-Provide the same identifier type you used for start. If both are provided, the camera entity is used.
-
-**Examples**
-
-By camera entity:
+**Example**
 
 ```yaml
 service: cam_record.record_stop
 data:
-  camera_entity_id: camera.front_door
-```
-
-By stream URL:
-
-```yaml
-service: cam_record.record_stop
-data:
-      camera_entity_id: camera.front_door
+  stream_url: rtsp://<CAMERA_HOST>:<PORT>/<STREAM_PATH>?mp4
 ```
 
 ---
@@ -129,8 +101,8 @@ data:
 ## Quick Start (2 minutes)
 
 1. Create a directory for recordings, e.g. `/media/front_door`.
-2. From Developer Tools → Services, call `cam_record.record_start` with your camera entity and a filename under that folder.
-3. When you’re done, call `cam_record.record_stop` with the **same** camera entity.
+2. From Developer Tools → Services, call `cam_record.record_start` with your RTSP URL and a filename under that folder.
+3. When you’re done, call `cam_record.record_stop` with the **same** RTSP URL.
 
 ---
 
@@ -152,7 +124,7 @@ trigger:
     for: "00:00:10"   # optional grace period to avoid rapid stop/start
 
 variables:
-      camera_entity_id: camera.front_door
+  stream_url: rtsp://<CAMERA_HOST>:<PORT>/<STREAM_PATH>?mp4
   outdir: /media/front_door
 
 action:
@@ -161,13 +133,13 @@ action:
         sequence:
           - service: cam_record.record_start
             data:
-              camera_entity_id: "{{ cam }}"
+              stream_url: "{{ stream_url }}"
               filename: "{{ outdir }}/front_door_{{ now().strftime('%Y-%m-%d_%H-%M-%S') }}.mp4"
       - conditions: "{{ trigger.to_state.state == 'off' }}"
         sequence:
           - service: cam_record.record_stop
             data:
-              camera_entity_id: "{{ cam }}"
+              stream_url: "{{ stream_url }}"
 ```
 
 ### B) Dashboard toggle button to Start/Stop
@@ -193,7 +165,7 @@ trigger:
 action:
   - service: cam_record.record_start
     data:
-      camera_entity_id: camera.front_door
+      stream_url: rtsp://<CAMERA_HOST>:<PORT>/<STREAM_PATH>?mp4
       filename: /media/front_door/front_door_{{ now().strftime('%Y-%m-%d_%H-%M-%S') }}.mp4
 mode: single
 ```
@@ -209,7 +181,7 @@ trigger:
 action:
   - service: cam_record.record_stop
     data:
-      camera_entity_id: camera.front_door
+      stream_url: rtsp://<CAMERA_HOST>:<PORT>/<STREAM_PATH>?mp4
 mode: single
 ```
 
@@ -228,10 +200,10 @@ show_state: true
 ## Troubleshooting
 
 * **No file appears** → Ensure the parent folder exists and is writable (try under `/media`).
-* **Cannot stop recording**  Use the same identifier type you used to start (entity vs URL). If you started by entity, stop by entity.
+* **Cannot stop recording** → The `stream_url` in `record_stop` must match exactly what you used to start.
 * **RTSP instability** → Prefer TCP RTSP URLs (many cameras accept `?mp4`/TCP variants) or normalize via go2rtc.
 * **Storage growth** → Long clips grow quickly; use dated filenames/folders and prune periodically.
-* **Camera entity resolves to nothing** \u001a Add `stream:` to configuration.yaml and ensure your camera integration supports streaming.\n
+
 ---
 
 ## Development
@@ -239,17 +211,9 @@ show_state: true
 * **Domain:** `cam_record`
 * **Structure:** `custom_components/cam_record/`
 
-  * `__init__.py` - async services, camera-entity support, tracks processes
+  * `__init__.py` — registers `record_start` / `record_stop` and tracks processes
   * `services.yaml` — schemas and field hints
   * `manifest.json` — integration metadata
-  * `recorder.py` - thin wrapper around `ffmpeg` execution (graceful stop supported)
+  * `recorder.py` — thin wrapper around `ffmpeg` execution
 
 Contributions welcome!
-
-
-
-
-
-
-
-
