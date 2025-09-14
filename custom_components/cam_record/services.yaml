@@ -1,16 +1,10 @@
 record_start:
   description: Start recording a stream to a file.
   fields:
-    camera_entity_id:
-      description: Camera entity to record (preferred).
-      example: camera.front_door
-      selector:
-        entity:
-          domain: camera
     stream_url:
-      description: Stream URL (used if no camera entity is provided).
+      description: RTSP stream URL.
       example: rtsp://172.16.10.230:8554/front_door?mp4
-      required: false
+      required: true
       selector:
         text:
     filename:
@@ -21,17 +15,11 @@ record_start:
         text:
 
 record_stop:
-  description: Stop an active recording.
+  description: Stop recording from a given stream.
   fields:
-    camera_entity_id:
-      description: Camera entity to stop (preferred).
-      example: camera.front_door
-      selector:
-        entity:
-          domain: camera
     stream_url:
-      description: Stream URL to stop (used if no camera entity is provided).
+      description: RTSP stream URL to stop.
       example: rtsp://172.16.10.230:8554/front_door?mp4
-      required: false
+      required: true
       selector:
         text:

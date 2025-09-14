@@ -59,6 +59,7 @@ Add these lines to your **configuration.yaml** and restart Home Assistant:
 
 ```yaml
 ffmpeg:
+stream:
 cam_record:
 ```
 
@@ -230,7 +231,7 @@ show_state: true
 * **Cannot stop recording**  Use the same identifier type you used to start (entity vs URL). If you started by entity, stop by entity.
 * **RTSP instability** → Prefer TCP RTSP URLs (many cameras accept `?mp4`/TCP variants) or normalize via go2rtc.
 * **Storage growth** → Long clips grow quickly; use dated filenames/folders and prune periodically.
-
+* **Camera entity resolves to nothing** \u001a Add `stream:` to configuration.yaml and ensure your camera integration supports streaming.\n
 ---
 
 ## Development
@@ -244,6 +245,7 @@ show_state: true
   * `recorder.py` - thin wrapper around `ffmpeg` execution (graceful stop supported)
 
 Contributions welcome!
+
 
 
 
